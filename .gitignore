@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# Environment variables / secrets
+.env
+.env.*
+*.env
+
+# IDEgit add .
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
