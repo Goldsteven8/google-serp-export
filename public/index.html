@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Google SERP export (JSON)</title>
+</head>
+<body style="font-family:system-ui;max-width:900px;margin:40px auto;padding:0 16px">
+  <h1>Google SERP export (1. stránka, JSON)</h1>
+
+  <label for="q">Klíčové slovní spojení</label><br/>
+  <input id="q" style="width:100%;padding:10px;font-size:16px" placeholder="např. nejlepší běžecké boty" />
+
+  <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+    <button id="btnSearch" style="padding:10px 14px;font-size:16px;cursor:pointer">Hledat</button>
+    <button id="btnDownload" disabled style="padding:10px 14px;font-size:16px;cursor:pointer">Stáhnout JSON</button>
+  </div>
+
+  <div id="status" style="margin-top:12px;color:#666"></div>
+
+  <h2>Výsledky</h2>
+  <div id="results"></div>
+
+  <h2>Raw JSON</h2>
+  <pre id="raw" style="background:#f6f6f6;padding:12px;overflow:auto">(zatím nic)</pre>
+
+<script>
+  const qEl = document.getElementById("q");
+  const btnSearch = document.getElementById("btnSearch");
+  const btnDownload = document.getElementById("btnDownload");
+  const resultsEl = document.getElementById("results");
+  const rawEl = document.getElementById("raw");
+  const statusEl = document.getElementById("status");
+
+  let lastJson = null;
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function render(json) {
+    resultsEl.innerHTML = "";
+    (json.results || []).forEach(r => {
+      const div = document.createElement("div");
+      div.style.margin = "14px 0";
+      div.innerHTML = `
+        <div><b>${r.position}.</b> <a href="${escapeHtml(r.link)}" target="_blank" rel="noreferrer">${escapeHtml(r.title)}</a></div>
+        <div style="color:#555">${escapeHtml(r.displayLink || "")}</div>
+        <div style="margin-top:4px">${escapeHtml(r.snippet || "")}</div>
+      `;
+      resultsEl.appendChild(div);
+    });
+
+    rawEl.textContent = JSON.stringify(json, null, 2);
+  }
+
+  async function doSearch() {
+    const q = qEl.value.trim();
+    if (!q) {
+      alert("Zadej klíčové slovní spojení.");
+      return;
+    }
+
+    btnSearch.disabled = true;
+    btnDownload.disabled = true;
+    statusEl.textContent = "Hledám…";
+    resultsEl.innerHTML = "";
+    rawEl.textContent = "(čekám na odpověď)";
+    lastJson = null;
+
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const json = await res.json();
+
+      if (!res.ok) {
+        statusEl.textContent = `Chyba: ${json.error || res.status}`;
+        rawEl.textContent = JSON.stringify(json, null, 2);
+        return;
+      }
+
+      lastJson = json;
+      statusEl.textContent = `Hotovo: ${json.count} výsledků pro "${json.query}"`;
+      render(json);
+      btnDownload.disabled = false;
+    } catch (e) {
+      statusEl.textContent = "Chyba připojení k API.";
+      rawEl.textContent = String(e);
+    } finally {
+      btnSearch.disabled = false;
+    }
+  }
+
+  function downloadJson() {
+    if (!lastJson) return;
+
+    const blob = new Blob([JSON.stringify(lastJson, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const q = (lastJson.query || "serp").toString().trim().replaceAll(/\s+/g, "_");
+    const filename = `serp_${q}.json`;
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  }
+
+  btnSearch.addEventListener("click", doSearch);
+  btnDownload.addEventListener("click", downloadJson);
+
+  qEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
+</script>
+</body>
+</html>
