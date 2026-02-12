@@ -17,32 +17,36 @@ Jednoduchá webová aplikace pro zadání klíčového slovního spojení a zís
 - Python 3.10+ (doporučeno)
 
 ## Lokální spuštění
+
 1. Nainstaluj závislosti:
-   ```bash
-   pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+Nastav SerpAPI klíč:
 
-2. Nastav SerpAPI klíč:
-   export SERPAPI_KEY="YOUR_KEY"
+Linux/macOS:
 
-   Windows PowerShell:
-   $env:SERPAPI_KEY="YOUR_KEY"
-   
-3. Spusť aplikaci:
-   python api/index.py
+export SERPAPI_KEY="YOUR_KEY"
+Windows PowerShell:
 
-4. Spusť:
-   UI: http://127.0.0.1:8000/
-   API: http://127.0.0.1:8000/api/search?q=python
+$env:SERPAPI_KEY="YOUR_KEY"
+Spusť aplikaci:
 
-## Testy 
-   python -m pytest -q
+python api/index.py
+Otevři:
 
-## Nasazení 
-   Aplikace je připravená pro hosting (Render/Railway) přes gunicorn:
-   gunicorn api.index:app --bind 0.0.0.0:$PORT
+UI: http://127.0.0.1:8000/
 
-   Env proměnná na hostingu:
-   SERPAPI_KEY
+API: http://127.0.0.1:8000/api/search?q=python
+
+Testy
+python -m pytest -q
+Nasazení
+Aplikace je připravená pro hosting (Render/Railway) přes gunicorn:
+
+gunicorn api.index:app --bind 0.0.0.0:$PORT
+Env proměnná na hostingu:
+
+SERPAPI_KEY
 
 
 
