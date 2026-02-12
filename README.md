@@ -44,10 +44,9 @@ python -m pytest -q
 
 Nasazení
 Aplikace je připravená pro hosting (Render/Railway) přes gunicorn:
-
 gunicorn api.index:app --bind 0.0.0.0:$PORT
-Env proměnná na hostingu:
 
+Env proměnná na hostingu:
 SERPAPI_KEY
 
 
