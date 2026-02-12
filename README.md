@@ -21,17 +21,18 @@ Jednoduchá webová aplikace pro zadání klíčového slovního spojení a zís
 1. Nainstaluj závislosti:
 ```bash
 pip install -r requirements.txt
+
 Nastav SerpAPI klíč:
 
 Linux/macOS:
-
 export SERPAPI_KEY="YOUR_KEY"
+
 Windows PowerShell:
-
 $env:SERPAPI_KEY="YOUR_KEY"
-Spusť aplikaci:
 
+Spusť aplikaci:
 python api/index.py
+
 Otevři:
 
 UI: http://127.0.0.1:8000/
@@ -40,6 +41,7 @@ API: http://127.0.0.1:8000/api/search?q=python
 
 Testy
 python -m pytest -q
+
 Nasazení
 Aplikace je připravená pro hosting (Render/Railway) přes gunicorn:
 
